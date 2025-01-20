@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" style="height:100%;margin:0;padding:0;">
+<meta content="می مپس اولین نقشه رایگان ایران با قابلیت  استفاده در اپلیکیشن ها و وب سایت ها" name="description" />
+<meta content="Babak Alizadeh" name="author" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta lang="fa">
+<title>MeMaps</title>
+<meta charset="utf-8">
+<link rel="icon" type="image/png" href="/favicons/favicon-96x96.png" sizes="96x96" />
+<link rel="icon" type="image/svg+xml" href="/favicons/favicon.svg" />
+<link rel="shortcut icon" href="/favicons/favicon.ico" />
+<link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-title" content="memaps" />
+<link rel="manifest" href="/favicons/site.webmanifest" />
+<link rel="stylesheet" href="/libs/leaflet.css" />
+<script src="/libs/leaflet.js"></script>
+<script src="/libs/leaflet-hash.js"></script>
+<link href="/css/bootstrap.rtl.min.css" rel="stylesheet">
+<link href="/fonts/vazirmatn/Vazirmatn-font-face.css" rel="stylesheet">
+<script src="/js/bootstrap.bundle.min.js"></script>
+<style type="text/css">
+    .leaflet-tile-container {
+        pointer-events: auto;
+    }
+</style>
+</head>
+<style>
+    .nav-item .nav-link:hover,
+    .navbar-brand {
+        color: rgba(240, 240, 240, 0.925);
+    }
+
+    .leaflet-control-attribution a {
+        font-family: Vazirmatn, sans-serif;
+    }
+</style>
+
+<body style="height:100%;margin:0;padding:0;">
+    <nav class="navbar navbar-expand-lg border-bottom border-primary border-3" style="background: #303475;"  data-bs-theme="dark">
+        <div class="container-fluid">
+            <a class="navbar-brand text-white" href="/">
+                <img src="/favicons/favicon.svg" alt="Bootstrap" width="34" height="34">
+                 MeMaps
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" target="_blank" href="https://parspack.com">پارس‌پک</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" target="_blank" href="https://t.me/ir_openstreetmap">کانال تلگرام</a>
+                    </li>
+                </ul>
+
+            </div>
+        </div>
+    </nav>
+    <div id="map" style="height:89.5%;"></div>
+    <script>
+        //<![CDATA[
+        var map = L.map('map').setView([35.69975547249546, 51.33803292808358], 14);
+        L.control.scale({ imperial: false }).addTo(map);
+        L.tileLayer('http://memaps.ir/hot/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> | <a href="https://parspack.com">استوار بر روی راهکارهای ابری پارس‌پک</a> ',
+            maxZoom: 21,
+            maxNativeZoom: 20
+        }).addTo(map);
+
+
+        var hash = L.hash(map)
+        //]]>
+    </script>
+</body>
+
+</html>
