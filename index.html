@@ -13,11 +13,16 @@
 <meta name="apple-mobile-web-app-title" content="memaps" />
 <link rel="manifest" href="/favicons/site.webmanifest" />
 <link rel="stylesheet" href="/libs/leaflet.css" />
+<link rel="stylesheet" href="/libs/L.Control.Locate.min.css" />
 <script src="/libs/leaflet.js"></script>
 <script src="/libs/leaflet-hash.js"></script>
+<script src="/libs/Leaflet.VectorGrid.bundled.js"></script>
+<script src="/libs/L.Control.Locate.min.js"></script>
 <link href="/css/bootstrap.rtl.min.css" rel="stylesheet">
 <link href="/fonts/vazirmatn/Vazirmatn-font-face.css" rel="stylesheet">
 <script src="/js/bootstrap.bundle.min.js"></script>
+<link rel="stylesheet" href="/libs/geosearch.css" />
+<script src="/libs/geosearch.min.js"></script>
 <style type="text/css">
     .leaflet-tile-container {
         pointer-events: auto;
@@ -30,17 +35,20 @@
         color: rgba(240, 240, 240, 0.925);
     }
 
-    .leaflet-control-attribution a {
+    .leaflet-control-attribution a,
+    leaflet-control-layers-selector::after,
+    .leaflet-container {
         font-family: Vazirmatn, sans-serif;
     }
 </style>
 
 <body style="height:100%;margin:0;padding:0;">
-    <nav class="navbar navbar-expand-lg border-bottom border-primary border-3" style="background: #303475;"  data-bs-theme="dark">
+    <nav class="navbar navbar-expand-lg border-bottom border-primary border-3" style="background: #303475;"
+        data-bs-theme="dark">
         <div class="container-fluid">
             <a class="navbar-brand text-white" href="/">
                 <img src="/favicons/favicon.svg" alt="Bootstrap" width="34" height="34">
-                 MeMaps
+                MeMaps
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                 data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
@@ -49,6 +57,11 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" target="_blank"
+                            href="https://editor.memaps.ir/#background=custom:https://memaps.ir/hot/{z}/{x}/{y}.png&locale=fa&map=14.29/35.7010/51.3432">ویرایش
+                            نقشه</a>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link" target="_blank" href="https://site.memaps.ir">مستندات توسعه</a>
                     </li>
@@ -65,18 +78,62 @@
     </nav>
     <div id="map" style="height:89.5%;"></div>
     <script>
-        //<![CDATA[
+        var osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap'
+        });
+
+        var mapbox = L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap contributors, Tiles style by Humanitarian OpenStreetMap Team hosted by OpenStreetMap France'
+        });
+
+        var memapsRaster = L.tileLayer('https://memaps.ir/hot/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> | <a href="https://parspack.com">استوار بر روی راهکارهای ابری پارس‌پک</a> ',
+            maxZoom: 19,
+            maxNativeZoom: 20
+        });
+
+        var memapsVector = L.vectorGrid
+            .protobuf('https://vector.memaps.ir/icesheet_outlines,planet_osm_line/{z}/{x}/{y}', {
+                vectorTileLayerStyles: {
+                    'points': {
+                        color: 'red',
+                        fill: false
+                    }
+                }
+            });
         var map = L.map('map').setView([35.69975547249546, 51.33803292808358], 14);
         L.control.scale({ imperial: false }).addTo(map);
-        L.tileLayer('http://memaps.ir/hot/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> | <a href="https://parspack.com">استوار بر روی راهکارهای ابری پارس‌پک</a> ',
-            maxZoom: 21,
-            maxNativeZoom: 20
+        memapsRaster.addTo(map);
+        var baseLayers = {
+            "می مپس رستر": memapsRaster,
+            "می مپس وکتور": memapsVector,
+            "Mapbox": mapbox,
+            "OpenStreetMap": osm
+        };
+        L.control.layers(baseLayers).addTo(map);
+        map.attributionControl.setPrefix();
+        // create control and add to map
+        var lc = L.control.locate({
+            locateOptions: {
+                enableHighAccuracy: true
+            },
+            strings: {
+                title: "الان کجام ؟"
+            }
         }).addTo(map);
 
-
+        // request location update and set location
+        lc.start();
+        const search = new GeoSearch.GeoSearchControl({
+            provider: new GeoSearch.OpenStreetMapProvider(),
+            notFoundMessage: 'متاسفیم، نتیجه‌ای یافت نشد!',
+            style: 'bar',
+            searchLabel : 'دنبال چی میگردی؟'
+        });
+        map.addControl(search);
         var hash = L.hash(map)
-        //]]>
     </script>
 </body>
 
