@@ -183,7 +183,7 @@
   max-width: calc(100% - 120px);
   margin: 10px auto 0;
   cursor: auto;
-  z-index: 1000;
+  z-index: 999;
 }
 
 .leaflet-geosearch-bar form {
