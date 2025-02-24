@@ -72,7 +72,6 @@
                         <a class="nav-link" target="_blank" href="https://parspack.com">پارس‌پک</a>
                     </li>
                 </ul>
-
             </div>
         </div>
     </nav>
@@ -103,7 +102,21 @@
                     }
                 }
             });
-        var map = L.map('map').setView([35.69975547249546, 51.33803292808358], 14);
+        // مقدار پیش‌فرض اگر مختصات ذخیره نشده باشد
+        const defaultCenter = [35.69975547249546, 51.33803292808358]; // مختصات تهران به عنوان مثال
+        const defaultZoom = 14;
+
+        // دریافت مختصات ذخیره شده از localStorage
+        const savedCenter = localStorage.getItem("mapCenter");
+        const center = savedCenter ? JSON.parse(savedCenter) : defaultCenter;
+
+        // مقدار بزرگنمایی ذخیره‌شده
+        const savedZoom = localStorage.getItem("mapZoom");
+        const zoom = savedZoom ? JSON.parse(savedZoom) : defaultZoom;
+
+        // مقداردهی نقشه
+        const map = L.map("map").setView(center, zoom);
+
         L.control.scale({ imperial: false }).addTo(map);
         memapsRaster.addTo(map);
         var baseLayers = {
@@ -116,8 +129,13 @@
         map.attributionControl.setPrefix();
         // create control and add to map
         var lc = L.control.locate({
+            setView: "once",
+            keepCurrentZoomLevel: true,
+            drawCircle: false,
+            showPopup: false,
+            enableHighAccuracy: false, // دقت بالا را غیرفعال می‌کنیم
             locateOptions: {
-                enableHighAccuracy: true
+                watch: false // از ردیابی پیوسته جلوگیری می‌کنیم
             },
             strings: {
                 title: "الان کجام ؟"
@@ -125,15 +143,26 @@
         }).addTo(map);
 
         // request location update and set location
-        lc.start();
+
         const search = new GeoSearch.GeoSearchControl({
             provider: new GeoSearch.OpenStreetMapProvider(),
             notFoundMessage: 'متاسفیم، نتیجه‌ای یافت نشد!',
             style: 'bar',
-            searchLabel : 'دنبال چی میگردی؟'
+            searchLabel: 'دنبال چی میگردی؟'
         });
         map.addControl(search);
-        var hash = L.hash(map)
+        map.on("moveend", function () {
+            const center = map.getCenter();
+            localStorage.setItem("mapCenter", JSON.stringify([center.lat, center.lng]));
+            localStorage.setItem("mapZoom", map.getZoom());
+        });
+        
+        // بررسی وضعیت دسترسی به موقعیت مکانی
+        map.on("locationerror", function (e) {
+            alert('در حال حاضر دسترسی به موقعیت مکانی شما فراهم نیست.');
+            locateControl.stop(); // متوقف کردن تلاش برای موقعیت‌یابی مجدد
+        });
+        var hash = L.hash(map);
     </script>
 </body>
 
